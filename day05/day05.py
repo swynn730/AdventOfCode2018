@@ -10,34 +10,54 @@
 	# +	In abAB, no two adjacent units are of the same type, and so nothing happens.
 	# +	In aabAAB, even though aa and AA are of the same type, their polarities match, 
 	# 	and so nothing happens.
-polymer = "dabAcCaCBAcCcaDA"
+#polymer = "dabAcCaCBAcCcaDA"
 
 # Part 1 
-# Answer should be.
-#
-# Part 2 
-# Answer should be.
-
-import re
+# Answer should be 10762.
 
 with open("input.txt") as f_handle:
-	polymer = f_handle.read()
-	pass
+	polymer = f_handle.read().strip()
 
-# Use while loop and two counters
-# One counter is on the current index, the other counter is looking at the next
-# Use the counter to get the value of the two indexes and compare them
-	# If they are equal...keep going
-	# If they are not equal
-		# check if they react to one another
-			# if index1.lower() == index2.lower()
-				# they might be able to react!
-				# if index1.isupper() and index2.islower() or index1.islower() and index2.isupper()
-					# they can react for sure!
-					# remove index2
-					# remove index1
-					# we should start at the beginning again so reset counter -> counter = 0
+# Making this a mutable list makes it much easier to process.
+polymer = list(polymer)
 
-units_remaining = 0
-print("After fully reacting the scanned polymer the amount of units that remain is:", units_remaining)
-print("", units_remaining)
+isStillReacting = True
+non_reaction_counter = 0
+
+# Continually compares the value of the current and upcoming element in the polymer sequence.
+while (isStillReacting):
+	polymer_length = len(polymer)
+
+	for current_idx in range(polymer_length):
+		next_idx = current_idx + 1
+
+		# The whole polymer sequence was traversed and there were no more reactions to process.
+		if non_reaction_counter >= polymer_length - 1:
+			isStillReacting = False
+
+		# To prevent from running out of elements to compare; start from the beginning.	
+		if next_idx > polymer_length - 1:
+			break
+
+		current_char = polymer[current_idx]
+		next_char = polymer[next_idx]
+
+		# Possible reaction...	
+		if current_char.lower() == next_char.lower():
+
+			# This is a reaction; so remove the reactive elements.
+			# The next element has to be removed before the current element to prevent an index out of range error.
+			# Finally, since a reaction did in fact happen, reset the counter and then resume processing the elements.
+			if ( current_char.isupper() and next_char.islower() ) or ( current_char.islower() and next_char.isupper() ):		
+				polymer.pop(next_idx)	
+				polymer.pop(current_idx)
+				polymer_length = len(polymer)			
+				non_reaction_counter = 0
+				continue
+
+		# No reaction...check the next pair of elements.
+		non_reaction_counter += 1
+
+units_remaining = len(polymer)
+
+print("After fully reacting the polymer the amount of units that remain are:", units_remaining)
